@@ -1,0 +1,53 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: media
+  strategy:
+    rollingUpdate:
+      maxSurge: 3
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: media
+    spec:
+      volumes:
+        - name: postgres-pv-media
+          persistentVolumeClaim:
+            claimName: media-pv-claim
+      containers:
+        - env:
+            - name: ConnectionStrings__pgsql
+              value: 'Host=localhost;Database=MediaData;Username=postgres;Password=MediaData@2020;'
+            - name: ConnectionStrings__zipkin
+              value: 'http://zipkin:9411/'
+          image: docker.pkg.github.com/rvtr/rvtrx-api-media/media:master-aspnet-rest
+          imagePullPolicy: Always
+          name: media
+          ports:
+            - containerPort: 80
+              name: media-http
+          resources:
+
+        - env:
+            - name: POSTGRES_PASSWORD
+              value: MediaData@2020
+          image: postgres:12
+          imagePullPolicy: Always
+          name: postgres
+          ports:
+            - containerPort: 5432
+              name: postgres-tcp
+          resources:
+          volumeMounts:
+            - mountPath: /acct/storage
+              name: postgres-pv-media
+      imagePullSecrets:
+        - name: github

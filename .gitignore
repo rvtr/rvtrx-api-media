@@ -1,0 +1,16 @@
+# dotnet
+bin/
+code_coverage/
+obj/
+test_coverage/
+.vs/
+.vscode/
+
+appsettings*
+!appsettings.json
+
+# macos
+.DS_Store
+
+# sonarcloud
+.sonarqube/
