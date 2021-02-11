@@ -8,8 +8,12 @@ namespace RVTR.Media.Domain.Models
   /// </summary>
   public class MediaModel : IValidatableObject
   {
-    public int Id { get; set; }
-
+    public int Id { get; set; } // id that it belongs to
+    public string Group { get; set; } // user affiliation (profile, campground, campsite)
+    public int FileSize { get; set; } //5mb max
+    public string FileType { get; set; } //azure cosmos content type
+    public string Uri { get; set; } // where the image is IMPORTANT
+    public string AltText { get; set; } // text description
 
     /// <summary>
     /// Empty constructor
