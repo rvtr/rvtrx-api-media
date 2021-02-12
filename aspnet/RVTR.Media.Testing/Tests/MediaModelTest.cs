@@ -11,10 +11,7 @@ namespace RVTR.Media.Testing.Tests
     {
       new object[]
       {
-        new MediaModel()
-        {
-          Id = 0
-        }
+        new MediaModel() { Id = 0 }
       }
     };
 
