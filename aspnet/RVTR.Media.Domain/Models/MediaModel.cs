@@ -17,7 +17,7 @@ namespace RVTR.Media.Domain.Models
   {
 
     public const long MaxFileSize = 5000000;
-    public int Id { get; set; } //  of image for DB
+    public int Id { get; set; } //  Id of image from DB
 
     [Required(ErrorMessage = "GroupId is required")]
     public int GroupId { get; set; } // Id of group it belongs to
@@ -52,11 +52,11 @@ namespace RVTR.Media.Domain.Models
       }
       if (string.IsNullOrEmpty(Group))
       {
-        yield return new ValidationResult("GroupId can not be null.");
+        yield return new ValidationResult("Group can not be null.");
       }
       if (string.IsNullOrEmpty(FileType))
       {
-        yield return new ValidationResult("GroupId can not be null.");
+        yield return new ValidationResult("FileType can not be null.");
       }
     }
   }
