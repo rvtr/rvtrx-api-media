@@ -43,21 +43,25 @@ namespace RVTR.Media.Domain.Models
     /// Represents the _Media_ `Validate` method
     /// </summary>
     /// <param name="validationContext"></param>
-    /// <returns></returns>
+    /// <returns>List of Validation result</returns>
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-      if (string.IsNullOrEmpty(GroupId.ToString()))
+      List<ValidationResult> result = new List<ValidationResult>();
+
+      if (string.Equals(GroupId.ToString(), "0"))
       {
-        yield return new ValidationResult("GroupId can not be null.");
+        result.Add(new ValidationResult("GroupId can not be null."));
       }
       if (string.IsNullOrEmpty(Group))
       {
-        yield return new ValidationResult("Group can not be null.");
+        result.Add(new ValidationResult("Group can not be null."));
       }
       if (string.IsNullOrEmpty(FileType))
       {
-        yield return new ValidationResult("FileType can not be null.");
+        result.Add(new ValidationResult("FileType can not be null."));
       }
+
+      return result;
     }
   }
 }
