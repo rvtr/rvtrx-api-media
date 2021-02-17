@@ -7,31 +7,15 @@ namespace RVTR.Media.Domain.Models
   /// Represents the _Media_ model
   /// </summary>
   /// <param name="Id"></param>
-  /// <param name="GroupId"></param>
-  /// <param name="Group"></param>
-  /// <param name="FileSize"></param>
-  /// <param name="FileType"></param>
   /// <param name="Uri"></param>
   /// <param name="AltText"></param>
   public class MediaModel : IValidatableObject
   {
-
-    public const long MaxFileSize = 5000000;
-    public int Id { get; set; } //  Id of image from DB
-
-    [Required(ErrorMessage = "GroupId is required")]
-    public int GroupId { get; set; } // Id of group it belongs to
-
-    [Required(ErrorMessage = "Group is required")]
-    [RegularExpression(@"(profile|campground|campsite)", ErrorMessage = "Account affiliation not recognized.")]
-    public string Group { get; set; } // user affiliation (profile, campground, campsite)
-
-    [Required(ErrorMessage = "FileType is required")]
-    [MaxLength(100, ErrorMessage = "FileName is to long")]
-    [RegularExpression(@".*\.(jpg|JPG|png|PNG)", ErrorMessage = "File type must be correct.")]
-    public string FileType { get; set; } //azure cosmos content type
-    public string Uri { get; set; } // where the image is IMPORTANT
-    public string AltText { get; set; } // text description
+    public int Id { get; set; } 
+    [Required(ErrorMessage = "URL is required")]
+    public string Uri { get; set; } 
+    [Required(ErrorMessage = "AltText is required")]
+    public string AltText { get; set; } 
 
     /// <summary>
     /// Empty constructor
@@ -48,17 +32,13 @@ namespace RVTR.Media.Domain.Models
     {
       List<ValidationResult> result = new List<ValidationResult>();
 
-      if (string.Equals(GroupId.ToString(), "0"))
+      if (string.IsNullOrEmpty(Uri))
       {
-        result.Add(new ValidationResult("GroupId can not be null."));
+        result.Add(new ValidationResult("URL can not be null."));
       }
-      if (string.IsNullOrEmpty(Group))
+      if (string.IsNullOrEmpty(AltText))
       {
-        result.Add(new ValidationResult("Group can not be null."));
-      }
-      if (string.IsNullOrEmpty(FileType))
-      {
-        result.Add(new ValidationResult("FileType can not be null."));
+        result.Add(new ValidationResult("AltText can not be null."));
       }
 
       return result;

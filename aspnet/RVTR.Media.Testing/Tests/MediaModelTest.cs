@@ -14,11 +14,8 @@ namespace RVTR.Media.Testing.Tests
         new MediaModel()
         {
             Id = 0,
-            GroupId = 1,
-            Group = "profile",
-            FileType = ".jpg",
-            Uri = "",
-            AltText = ""
+            Uri = "https://",
+            AltText = "alternate text"
         }
       }
     };
@@ -46,7 +43,7 @@ namespace RVTR.Media.Testing.Tests
     [Fact]
     public void Test_Validate_MediaModel_EmptyID()
     {
-      MediaModel media = new MediaModel(){GroupId = 12345, Group ="profile", FileType = ".png",Uri = "https://notblobstorage/%22", AltText="hat"};
+      MediaModel media = new MediaModel(){Uri = "https://notblobstorage/%22", AltText="hat"};
 
       var validationContext = new ValidationContext(media);
       var actual = Validator.TryValidateObject(media, validationContext, null, true);
@@ -54,10 +51,11 @@ namespace RVTR.Media.Testing.Tests
       Assert.True(actual);
     }
 
+
     [Fact]
-    public void Test_Validate_MediaModel_EmptyGroupID()
+    public void Test_Validate_MediaModel_EmptyUri()
     {
-      MediaModel media = new MediaModel(){Id = 12345, Group ="profile", FileType = ".png",Uri = "https://notblobstorage/%22", AltText="hat"};
+      MediaModel media = new MediaModel(){Id = 12345, AltText="hat"};
 
       var validationContext = new ValidationContext(media);
       
@@ -65,45 +63,13 @@ namespace RVTR.Media.Testing.Tests
     }
 
     [Fact]
-    public void Test_Validate_MediaModel_EmptyGroup()
+    public void Test_Validate_MediaModel_EmptyAltText()
     {
-      MediaModel media = new MediaModel(){Id = 12345,GroupId = 54321, FileType = ".png",Uri = "https://notblobstorage/%22", AltText="hat"};
+      MediaModel media = new MediaModel(){Id = 12345, Uri = "https://notblobstorage/%22"};
 
       var validationContext = new ValidationContext(media);
       
       Assert.NotEmpty(media.Validate(validationContext));
-    }
-
-    [Fact]
-    public void Test_Validate_MediaModel_EmptyFileType()
-    {
-      MediaModel media = new MediaModel(){Id = 12345,GroupId = 54321,Group = "profile", Uri = "https://notblobstorage/%22", AltText="hat"};
-
-      var validationContext = new ValidationContext(media);
-      
-      Assert.NotEmpty(media.Validate(validationContext));
-    }
-
-    [Fact]
-    public void Test_Validate_MediaModel_BadGroup()
-    {
-      MediaModel media = new MediaModel(){Id =12345, GroupId = 12345, Group ="profile12345", FileType = ".png",Uri = "https://notblobstorage/%22", AltText="hat"};
-
-      var validationContext = new ValidationContext(media);
-      var actual = Validator.TryValidateObject(media, validationContext, null, true);
-
-      Assert.False(actual);
-    }
-
-    [Fact]
-    public void Test_Validate_MediaModel_BadFileType()
-    {
-      MediaModel media = new MediaModel(){Id =12345, GroupId = 12345,Group ="profile", FileType = ".pnga",Uri = "https://notblobstorage/%22", AltText="hat"};
-
-      var validationContext = new ValidationContext(media);
-      var actual = Validator.TryValidateObject(media, validationContext, null, true);
-
-      Assert.False(actual);
     }
   }
 }
