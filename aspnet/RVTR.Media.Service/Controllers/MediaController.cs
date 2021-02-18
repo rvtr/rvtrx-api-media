@@ -48,7 +48,7 @@ namespace RVTR.Media.Service.Controllers
 
         var mediaModel = await _unitOfWork.Media.SelectAsync(id);
 
-        await _unitOfWork.Media.DeleteAsync(mediaModel.Id);
+        await _unitOfWork.Media.DeleteAsync(mediaModel.MediaId);
         await _unitOfWork.CommitAsync();
 
 
