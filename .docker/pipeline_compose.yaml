@@ -7,7 +7,9 @@ services:
     depends_on:
       - data
     environment:
+      ConnectionStrings__cosmosdb: '<connection string>'
       ConnectionStrings__pgsql: 'Host=data;Database=MediaData;Username=postgres;Password=MediaData@2020;'
+      ConnectionStrings__storage: '<connection string>'
       ConnectionStrings__zipkin: 'http://trace:9411/'
     networks:
       - medialy
