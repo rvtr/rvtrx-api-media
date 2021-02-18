@@ -15,7 +15,7 @@ namespace RVTR.Media.Context
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-      modelBuilder.Entity<MediaModel>().HasKey(e => e.Id);
+      modelBuilder.Entity<MediaModel>().HasKey(e => e.MediaId);
     }
   }
 }

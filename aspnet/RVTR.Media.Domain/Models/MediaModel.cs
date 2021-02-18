@@ -13,21 +13,21 @@ namespace RVTR.Media.Domain.Models
   /// <param name="AltText"></param>
   public class MediaModel : IValidatableObject
   {
-    public int MediaId { get; set; } 
+    public int MediaId { get; set; }
 
     [Required(ErrorMessage = "Group is required")]
     [RegularExpression(@"(profile|campground|campsite)", ErrorMessage = "Group affiliation not recognized.")]
     public string Group { get; set; }
 
     [Required(ErrorMessage = "GroupIdentifier is required")]
-    [RegularExpression(@"^([a-zA-Z]+)([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5}) | ^([a-zA-Z]+) | ^([a-zA-Z]+)\-([0-9]+)", ErrorMessage = "Group Identifier not recognized.")]
+    [RegularExpression(@"((([a-zA-Z]+)([a-zA-Z0-9_\-\.]*)@([a-zA-Z0-9_\-\.]*)([a-zA-Z]+)\.([a-zA-Z]{2,5}))|(([a-zA-Z]+)([a-zA-Z_]*))|(([a-zA-Z]+)\-([0-9]+)))", ErrorMessage = "Group Identifier not recognized.")]
     public string GroupIdentifier { get; set; }
 
     [Required(ErrorMessage = "URL is required")]
-    public string Uri { get; set; } 
+    public string Uri { get; set; }
 
     [Required(ErrorMessage = "AltText is required")]
-    public string AltText { get; set; } 
+    public string AltText { get; set; }
 
     /// <summary>
     /// Empty constructor
