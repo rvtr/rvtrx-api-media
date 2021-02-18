@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Cosmos" Version="*" />
     <PackageReference Include="npgsql.entityframeworkcore.postgresql" Version="5.0.2" />
   </ItemGroup>
 
