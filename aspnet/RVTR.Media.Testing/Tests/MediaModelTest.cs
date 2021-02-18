@@ -13,7 +13,9 @@ namespace RVTR.Media.Testing.Tests
       {
         new MediaModel()
         {
-            Id = 0,
+            MediaId = 0,
+            Group = "profile",
+            GroupIdentifier = "your.name@email.com",
             Uri = "https://",
             AltText = "alternate text"
         }
@@ -55,7 +57,7 @@ namespace RVTR.Media.Testing.Tests
     [Fact]
     public void Test_Validate_MediaModel_EmptyUri()
     {
-      MediaModel media = new MediaModel(){Id = 12345, AltText="hat"};
+      MediaModel media = new MediaModel(){MediaId = 12345, AltText="hat"};
 
       var validationContext = new ValidationContext(media);
       
@@ -65,7 +67,7 @@ namespace RVTR.Media.Testing.Tests
     [Fact]
     public void Test_Validate_MediaModel_EmptyAltText()
     {
-      MediaModel media = new MediaModel(){Id = 12345, Uri = "https://notblobstorage/%22"};
+      MediaModel media = new MediaModel(){MediaId = 12345, Uri = "https://notblobstorage/%22"};
 
       var validationContext = new ValidationContext(media);
       
