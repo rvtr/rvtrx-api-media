@@ -70,44 +70,18 @@ namespace RVTR.Media.Service.Controllers
     /// <summary>
     ///
     /// </summary>
-    /// <param name="group"></param>
     /// <param name="groupidentifier"></param>
     /// <returns></returns>
-    [HttpGet("{group}/{groupidentifier}")]
+    [HttpGet("{groupidentifier}")]
     [ProducesResponseType(typeof(IEnumerable<MediaModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Get(string group, string groupidentifier)
+    public async Task<IActionResult> Get(string groupidentifier)
     {
       _logger.LogInformation($"retrieve media");
 
-      return Ok(await _unitOfWork.Media.SelectAsync());
+      return Ok(await _unitOfWork.Media.SelectAsync(groupidentifier));
 
     }
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    [HttpGet("{id}")]
-    [ProducesResponseType(typeof(MediaModel), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Get(int id)
-    {
-      _logger.LogDebug("retrieving media");
-
-      var mediaModel = (await _unitOfWork.Media.SelectAsync(e => e.EntityId == id)).FirstOrDefault();
-
-      if (mediaModel is MediaModel thatMedia)
-      {
-        _logger.LogInformation($"retrieved media");
-
-        return Ok(thatMedia);
-      }
-
-      _logger.LogWarning($"missing media");
-
-      return NotFound();
-    }
 
     /// <summary>
     ///
