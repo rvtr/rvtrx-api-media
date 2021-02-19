@@ -50,7 +50,11 @@ namespace RVTR.Media.Service.Controllers
 
         var mediaModel = (await _unitOfWork.Media.SelectAsync(e => e.EntityId == id)).FirstOrDefault();
 
-        await _unitOfWork.Media.DeleteAsync(mediaModel.EntityId);
+        await _unitOfWork.Media.DeleteAsync(mediaModel.EntityId); //look at this
+        BlobClient blob = new BlobClient(new System.Uri(mediaModel.Uri));
+        await blob.DeleteAsync();
+
+        await _unitOfWork.Media.DeleteAsync(mediaModel.MediaId);
         await _unitOfWork.CommitAsync();
 
 
@@ -158,14 +162,14 @@ namespace RVTR.Media.Service.Controllers
     /// <summary>
     ///
     /// </summary>
-    /// <param name="media"></param>
+    /// <param name="files"></param>
     /// <param name="group"></param>
     /// <param name="groupidentifier"></param>
     /// <returns></returns>
     [HttpPut("{group}/{groupidentifier}")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Put([FromBody] IFormFile media, string group, string groupidentifier)
+    public async Task<IActionResult> Put([FromForm] IFormFileCollection files, string group, string groupidentifier)
     {
       try
       {
