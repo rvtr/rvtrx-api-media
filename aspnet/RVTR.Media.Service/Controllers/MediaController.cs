@@ -144,31 +144,22 @@ namespace RVTR.Media.Service.Controllers
             switch (group)
             {
               case "profile":
-                {
-                  BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(model.Group);
-                  BlobClient blobClient = containerClient.GetBlobClient(model.GroupIdentifier + FileExtention);
-                  
-                  await blobClient.UploadAsync(file.OpenReadStream());
-                  model.Uri = blobClient.Uri.ToString();
-                  model.AltText = "Profile Picture";
-
-                  
-
-                  break;
-                }
               case "campground":
-                {
-                  // campgroundName/GUID.ext
-                  break;
-                }
               case "campsite":
                 {
-                  // campgroundName/lotNumber/GUID.ext
+                  BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(model.Group);
+                  BlobClient blobClient = containerClient.GetBlobClient(model.GroupIdentifier + System.Guid.NewGuid().ToString() + FileExtention);
+
+                  await blobClient.UploadAsync(file.OpenReadStream());
+                  model.Uri = blobClient.Uri.ToString();
+                  model.AltText = "Picture of " + model.GroupIdentifier;
+
                   break;
                 }
+
               default:
               {
-                break;
+                return BadRequest("Invalid group entered");
               }
             }
 
@@ -184,14 +175,13 @@ namespace RVTR.Media.Service.Controllers
 
           else
           {
-            //return error invalid file extention
+            return BadRequest("Invalid file extention");
           }
-
         }
 
         else
         {
-          //return error file too big
+          return BadRequest("File too large");
         }
       }
 
