@@ -158,7 +158,7 @@ namespace RVTR.Media.Testing.Tests
       var validationContext = new ValidationContext(media);
       var actual = Validator.TryValidateObject(media, validationContext, null, true);
 
-      Assert.False(actual);
+      Assert.True(actual);
     }
 
     [Fact]
