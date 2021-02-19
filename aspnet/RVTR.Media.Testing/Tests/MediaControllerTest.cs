@@ -1,6 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+<<<<<<< HEAD
+=======
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+>>>>>>> Controller test running, edited repo methods to fix controller errors
 using Microsoft.Extensions.Logging;
 using Moq;
 using RVTR.Media.Domain.Interfaces;
@@ -15,6 +20,22 @@ namespace RVTR.Media.Testing.Tests
     private readonly MediaController _controller;
     private readonly ILogger<MediaController> _logger;
     private readonly IUnitOfWork _unitOfWork;
+
+    public static readonly IEnumerable<object[]> Medias = new List<object[]>
+    {
+      new object[]
+      {
+        new FormFileCollection
+        {
+
+        },
+        new string("Hello World from a Fake File")
+        {
+
+        },
+        new string("test.pdf")
+      }
+    };
 
     public MediaControllerTest()
     {
@@ -46,18 +67,11 @@ namespace RVTR.Media.Testing.Tests
       Assert.NotNull(resultPass);
     }
 
-    [Fact]
-    public async void Test_Controller_Post()
+    [Theory]
+    [MemberData(nameof(Medias))]
+    public async void Test_Controller_Post(IFormFileCollection files, string group, string groupidentifier)
     {
-      var resultPass = await _controller.Post(new MediaModel());
-
-      Assert.NotNull(resultPass);
-    }
-
-    [Fact]
-    public async void Test_Controller_Put()
-    {
-      var resultPass = await _controller.Put(new MediaModel());
+      var resultPass = await _controller.Post(files, group, groupidentifier);
 
       Assert.NotNull(resultPass);
     }

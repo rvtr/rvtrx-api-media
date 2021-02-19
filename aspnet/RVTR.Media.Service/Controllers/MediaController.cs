@@ -158,37 +158,5 @@ namespace RVTR.Media.Service.Controllers
 
       return Accepted();
     }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="files"></param>
-    /// <param name="group"></param>
-    /// <param name="groupidentifier"></param>
-    /// <returns></returns>
-    [HttpPut("{group}/{groupidentifier}")]
-    [ProducesResponseType(StatusCodes.Status202Accepted)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Put([FromForm] IFormFileCollection files, string group, string groupidentifier)
-    {
-      try
-      {
-        _logger.LogDebug("updating media");
-
-        _unitOfWork.Media.Update(media);
-        await _unitOfWork.CommitAsync();
-
-        _logger.LogInformation($"updated media");
-
-        return Accepted(media);
-      }
-
-      catch
-      {
-        _logger.LogWarning($"missing media");
-
-        return NotFound();
-      }
-    }
   }
 }
