@@ -44,7 +44,6 @@ namespace RVTR.Media.Domain.Models
       {
         yield return new ValidationResult("URL can not be null.");
       }
-
       if (string.IsNullOrEmpty(AltText))
       {
         yield return new ValidationResult("AltText can not be null.");
