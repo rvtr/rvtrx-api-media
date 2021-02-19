@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -118,17 +119,72 @@ namespace RVTR.Media.Service.Controllers
     [HttpPost("{group}/{groupidentifier}")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
     public async Task<IActionResult> Post([FromForm] IFormFileCollection files, string group, string groupidentifier)
-    { 
-      Regex FileExtensionRegex = new Regex(@"([a-zA-Z0-9\s_\.-:])+.(png|jpg)$");
+    {
+      Regex FileExtensionRegex = new Regex(@"([a-zA-Z0-9\s_\.-:])+\.(png|jpg)$");
 
-      foreach(var file in files)
+      foreach (var file in files)
       {
-        if(file.Length < (5 * 1024 * 1024))
+
+        if (file.Length < (5 * 1024 * 1024))
         {
 
-          if(FileExtensionRegex.IsMatch(file.FileName))
+          if (FileExtensionRegex.IsMatch(file.FileName))
           {
+            BlobServiceClient blobServiceClient = new BlobServiceClient(System.Environment.GetEnvironmentVariable("ConnectionStrings__storage"));
 
+            string cosmosConnectionString = System.Environment.GetEnvironmentVariable("ConnectionStrings__cosmosdb");
+
+            string FileExtention = file.FileName.Substring(file.FileName.Length - 4);
+
+            MediaModel model = new MediaModel();
+            model.Group = group;
+            model.GroupIdentifier = groupidentifier;
+
+            
+            switch (group)
+            {
+              case "profile":
+                {
+                  BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(model.Group);
+                  BlobClient blobClient = containerClient.GetBlobClient(model.GroupIdentifier + FileExtention);
+                  
+                  await blobClient.UploadAsync(file.OpenReadStream());
+                  model.Uri = blobClient.Uri.ToString();
+                  model.AltText = "Profile Picture";
+
+                  
+
+                  break;
+                }
+              case "campground":
+                {
+                  // campgroundName/GUID.ext
+                  break;
+                }
+              case "campsite":
+                {
+                  // campgroundName/lotNumber/GUID.ext
+                  break;
+                }
+              default:
+              {
+                break;
+              }
+            }
+
+            _logger.LogDebug("adding media");
+
+            await _unitOfWork.Media.InsertAsync(model);
+            await _unitOfWork.CommitAsync();
+
+            _logger.LogInformation($"added media");
+
+            return Accepted(model);
+          }
+
+          else
+          {
+            //return error invalid file extention
           }
 
         }
@@ -140,14 +196,7 @@ namespace RVTR.Media.Service.Controllers
       }
 
 
-      _logger.LogDebug("adding media");
 
-      await _unitOfWork.Media.InsertAsync(model);
-      await _unitOfWork.CommitAsync();
-
-      _logger.LogInformation($"added media");
-
-      return Accepted(model);
 
     }
 
