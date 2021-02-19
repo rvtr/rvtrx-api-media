@@ -11,7 +11,7 @@ namespace RVTR.Media.Domain.Models
     public int MediaId { get; set; }
 
     [Required(ErrorMessage = "Group is required")]
-    [RegularExpression(@"(profile|campground|campsite)", ErrorMessage = "Group affiliation not recognized.")]
+    [RegularExpression(@"(profiles|campgrounds|campsites)", ErrorMessage = "Group affiliation not recognized.")]
     public string Group { get; set; }
 
     [Required(ErrorMessage = "GroupIdentifier is required")]
