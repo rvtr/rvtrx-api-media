@@ -121,73 +121,66 @@ namespace RVTR.Media.Service.Controllers
     public async Task<IActionResult> Post([FromForm] IFormFileCollection files, string group, string groupidentifier)
     {
       Regex FileExtensionRegex = new Regex(@"([a-zA-Z0-9\s_\.-:])+\.(png|jpg)$");
+      List<MediaModel> AcceptedModels = new List<MediaModel>();
 
       foreach (var file in files)
       {
-
-        if (file.Length < (5 * 1024 * 1024))
-        {
-
-          if (FileExtensionRegex.IsMatch(file.FileName))
-          {
-            BlobServiceClient blobServiceClient = new BlobServiceClient(System.Environment.GetEnvironmentVariable("ConnectionStrings__storage"));
-
-            string cosmosConnectionString = System.Environment.GetEnvironmentVariable("ConnectionStrings__cosmosdb");
-
-            string FileExtention = file.FileName.Substring(file.FileName.Length - 4);
-
-            MediaModel model = new MediaModel();
-            model.Group = group;
-            model.GroupIdentifier = groupidentifier;
-
-            
-            switch (group)
-            {
-              case "profile":
-              case "campground":
-              case "campsite":
-                {
-                  BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(model.Group);
-                  BlobClient blobClient = containerClient.GetBlobClient(model.GroupIdentifier + System.Guid.NewGuid().ToString() + FileExtention);
-
-                  await blobClient.UploadAsync(file.OpenReadStream());
-                  model.Uri = blobClient.Uri.ToString();
-                  model.AltText = "Picture of " + model.GroupIdentifier;
-
-                  break;
-                }
-
-              default:
-              {
-                return BadRequest("Invalid group entered");
-              }
-            }
-
-            _logger.LogDebug("adding media");
-
-            await _unitOfWork.Media.InsertAsync(model);
-            await _unitOfWork.CommitAsync();
-
-            _logger.LogInformation($"added media");
-
-            return Accepted(model);
-          }
-
-          else
-          {
-            return BadRequest("Invalid file extention");
-          }
-        }
-
-        else
+        if (file.Length > (5 * 1024 * 1024))
         {
           return BadRequest("File too large");
         }
+        if (!FileExtensionRegex.IsMatch(file.FileName))
+        {
+          return BadRequest("Invalid file extention");
+        }
+      }
+      foreach (var file in files)
+      {
+        BlobServiceClient blobServiceClient = new BlobServiceClient(System.Environment.GetEnvironmentVariable("ConnectionStrings__storage"));
+
+        string FileExtention = file.FileName.Substring(file.FileName.Length - 4);
+
+        MediaModel model = new MediaModel();
+        model.Group = group;
+        model.GroupIdentifier = groupidentifier;
+
+        switch (group)
+        {
+          case "profile":
+          case "campground":
+          case "campsite":
+            {
+              _logger.LogDebug("uploading media");
+
+              BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(model.Group);
+              BlobClient blobClient = containerClient.GetBlobClient(model.GroupIdentifier + System.Guid.NewGuid().ToString() + FileExtention);
+
+              await blobClient.UploadAsync(file.OpenReadStream());
+
+              _logger.LogDebug("uploaded media");
+
+              model.Uri = blobClient.Uri.ToString();
+              model.AltText = "Picture of " + model.GroupIdentifier;
+
+              _logger.LogDebug("adding media model");
+
+              await _unitOfWork.Media.InsertAsync(model);
+              await _unitOfWork.CommitAsync();
+
+              _logger.LogInformation($"added media model");
+
+              AcceptedModels.Add(model);
+              break;
+            }
+
+          default:
+            {
+              return BadRequest("Invalid group entered");
+            }
+        }
       }
 
-
-
-
+      return Accepted(AcceptedModels);
     }
 
     /// <summary>
