@@ -36,13 +36,13 @@ namespace RVTR.Media.Service.Controllers
     /// <summary>
     ///
     /// </summary>
-    /// <param name="Group"></param>
-    /// <param name="GroupIdentifier"></param>
+    /// <param name="group"></param>
+    /// <param name="groupidentifier"></param>
     /// <returns></returns>
     [HttpDelete("{group}/{groupidentifier}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(string Group, string GroupIdentifier)
+    public async Task<IActionResult> Delete(string group, string groupidentifier)
     {
       try
       {
@@ -111,13 +111,16 @@ namespace RVTR.Media.Service.Controllers
     /// <summary>
     ///
     /// </summary>
-    /// <param name="media"></param>
+    /// <param name="file"></param>
+    /// <param name="group"></param>
+    /// <param name="groupidentifier"></param>
     /// <returns></returns>
-    [HttpPost]
+    [HttpPost("{group}/{groupidentifier}")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
-    public async Task<IActionResult> Post([FromBody] MediaModel media)
+    public async Task<IActionResult> Post([FromForm] IFormFileCollection file, string group, string groupidentifier)
     {
-
+      
+      
       _logger.LogDebug("adding media");
 
       await _unitOfWork.Media.InsertAsync(media);
@@ -133,11 +136,13 @@ namespace RVTR.Media.Service.Controllers
     ///
     /// </summary>
     /// <param name="media"></param>
+    /// <param name="group"></param>
+    /// <param name="groupidentifier"></param>
     /// <returns></returns>
-    [HttpPut]
+    [HttpPut("{group}/{groupidentifier}")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Put([FromBody] MediaModel media)
+    public async Task<IActionResult> Put([FromBody] IFormFile media, string group, string groupidentifier)
     {
       try
       {
