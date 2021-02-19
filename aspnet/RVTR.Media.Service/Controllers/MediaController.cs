@@ -111,24 +111,43 @@ namespace RVTR.Media.Service.Controllers
     /// <summary>
     ///
     /// </summary>
-    /// <param name="file"></param>
+    /// <param name="files"></param>
     /// <param name="group"></param>
     /// <param name="groupidentifier"></param>
     /// <returns></returns>
     [HttpPost("{group}/{groupidentifier}")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
-    public async Task<IActionResult> Post([FromForm] IFormFileCollection file, string group, string groupidentifier)
-    {
-      
-      
+    public async Task<IActionResult> Post([FromForm] IFormFileCollection files, string group, string groupidentifier)
+    { 
+      Regex FileExtensionRegex = new Regex(@"([a-zA-Z0-9\s_\.-:])+.(png|jpg)$");
+
+      foreach(var file in files)
+      {
+        if(file.Length < (5 * 1024 * 1024))
+        {
+
+          if(FileExtensionRegex.IsMatch(file.FileName))
+          {
+
+          }
+
+        }
+
+        else
+        {
+          //return error file too big
+        }
+      }
+
+
       _logger.LogDebug("adding media");
 
-      await _unitOfWork.Media.InsertAsync(media);
+      await _unitOfWork.Media.InsertAsync(model);
       await _unitOfWork.CommitAsync();
 
       _logger.LogInformation($"added media");
 
-      return Accepted(media);
+      return Accepted(model);
 
     }
 
