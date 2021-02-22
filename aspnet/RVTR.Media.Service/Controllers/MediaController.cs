@@ -31,6 +31,7 @@ namespace RVTR.Media.Service.Controllers
     /// </summary>
     /// <param name="logger"></param>
     /// <param name="unitOfWork"></param>
+    /// <param name="configuration"></param>
     public MediaController(ILogger<MediaController> logger, IUnitOfWork unitOfWork, IConfiguration configuration)
     {
       _logger = logger;
