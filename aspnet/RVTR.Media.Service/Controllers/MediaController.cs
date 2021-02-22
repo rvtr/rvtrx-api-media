@@ -5,6 +5,7 @@ using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RVTR.Media.Domain.Interfaces;
 using RVTR.Media.Domain.Models;
@@ -23,15 +24,18 @@ namespace RVTR.Media.Service.Controllers
     private readonly ILogger<MediaController> _logger;
     private readonly IUnitOfWork _unitOfWork;
 
+    private readonly IConfiguration _configuration;
+
     /// <summary>
     ///
     /// </summary>
     /// <param name="logger"></param>
     /// <param name="unitOfWork"></param>
-    public MediaController(ILogger<MediaController> logger, IUnitOfWork unitOfWork)
+    public MediaController(ILogger<MediaController> logger, IUnitOfWork unitOfWork, IConfiguration configuration)
     {
       _logger = logger;
       _unitOfWork = unitOfWork;
+      _configuration = configuration;
     }
 
     /// <summary>
@@ -113,7 +117,7 @@ namespace RVTR.Media.Service.Controllers
       }
       foreach (var file in files)
       {
-        BlobServiceClient blobServiceClient = new BlobServiceClient(System.Environment.GetEnvironmentVariable("ConnectionStrings__storage"));
+        BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("storage"));
 
         string FileExtention = file.FileName.Substring(file.FileName.Length - 4);
 
