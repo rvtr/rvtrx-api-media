@@ -9,6 +9,11 @@ namespace RVTR.Media.Domain.Models
   /// </summary>
   public class MediaModel : AEntity, IValidatableObject
   {
+<<<<<<< HEAD
+=======
+    public long MediaId { get; set; }
+
+>>>>>>> fixed cosmos connection, changed mediaId to long
     [Required(ErrorMessage = "Group is required")]
     [RegularExpression(@"(profiles|campgrounds|campsites)", ErrorMessage = "Group affiliation not recognized.")]
     public string Group { get; set; }
@@ -24,7 +29,17 @@ namespace RVTR.Media.Domain.Models
     public string AltText { get; set; }
 
     /// <summary>
+<<<<<<< HEAD
     /// Represents the _MediaModel_ `Validate` method
+=======
+    /// Empty constructor
+    /// </summary>
+    public MediaModel() { MediaId = System.DateTime.Now.Ticks; }
+
+
+    /// <summary>
+    /// Represents the _Media_ `Validate` method
+>>>>>>> fixed cosmos connection, changed mediaId to long
     /// </summary>
     /// <param name="validationContext"></param>
     /// <returns>List of Validation result</returns>

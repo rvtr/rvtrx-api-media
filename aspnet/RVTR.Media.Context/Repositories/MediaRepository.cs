@@ -15,7 +15,7 @@ namespace RVTR.Media.Context.Repositories
   {
     public MediaRepository(MediaContext context) : base(context) { }
 
-    public override async Task<MediaModel> SelectAsync(int id) => await Db
+    public override async Task<MediaModel> SelectAsync(long id) => await Db
       .Where(x => x.MediaId == id)
       .FirstOrDefaultAsync();
 

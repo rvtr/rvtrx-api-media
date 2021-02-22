@@ -56,7 +56,7 @@ namespace RVTR.Media.Service
 
       services.AddDbContext<MediaContext>(options =>
       {
-        options.UseCosmos(_configuration["Cosmosdb__AccountEndpoint"], _configuration["Cosmosdb__AccountKey"], _configuration["Cosmosdb__DatabaseName"]);
+        options.UseCosmos(_configuration["Cosmosdb:AccountEndpoint"], _configuration["Cosmosdb:AccountKey"], _configuration["Cosmosdb:DatabaseName"]);
       }, ServiceLifetime.Transient);
 
       services.AddScoped<ClientZipkinMiddleware>();
