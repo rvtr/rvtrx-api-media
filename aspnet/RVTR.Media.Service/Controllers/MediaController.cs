@@ -128,9 +128,9 @@ namespace RVTR.Media.Service.Controllers
 
         switch (group)
         {
-          case "profile":
-          case "campground":
-          case "campsite":
+          case "profiles":
+          case "campgrounds":
+          case "campsites":
             {
               _logger.LogDebug("uploading media");
 

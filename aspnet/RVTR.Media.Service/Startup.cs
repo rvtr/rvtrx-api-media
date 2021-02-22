@@ -56,10 +56,7 @@ namespace RVTR.Media.Service
 
       services.AddDbContext<MediaContext>(options =>
       {
-        options.UseNpgsql(_configuration.GetConnectionString("pgsql"), options =>
-        {
-          options.EnableRetryOnFailure(3);
-        });
+        options.UseCosmos(_configuration["Cosmosdb__AccountEndpoint"], _configuration["Cosmosdb__AccountKey"], _configuration["Cosmosdb__DatabaseName"]);
       }, ServiceLifetime.Transient);
 
       services.AddScoped<ClientZipkinMiddleware>();
