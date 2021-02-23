@@ -41,6 +41,7 @@ namespace RVTR.Media.Testing.Tests
       var loggerMock = new Mock<ILogger<MediaController>>();
       var repositoryMock = new Mock<IRepository<MediaModel>>();
       var unitOfWorkMock = new Mock<IUnitOfWork>();
+      var configurationMock = new Mock<IConfiguration>();
 
       repositoryMock.Setup(m => m.DeleteAsync(0)).Throws(new Exception());
       repositoryMock.Setup(m => m.DeleteAsync(1)).Returns(Task.CompletedTask);
@@ -53,6 +54,7 @@ namespace RVTR.Media.Testing.Tests
 
       _logger = loggerMock.Object;
       _unitOfWork = unitOfWorkMock.Object;
+      _configuration = configurationMock.Object;
       _controller = new MediaController(_logger, _unitOfWork, _configuration);
     }
 
