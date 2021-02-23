@@ -103,7 +103,6 @@ namespace RVTR.Media.Service.Controllers
     public async Task<IActionResult> Post([FromForm] IFormFileCollection files, string group, string groupidentifier)
     {
       Regex FileExtensionRegex = new Regex(@"([a-zA-Z0-9\s_\.-:])+\.(png|jpg)$");
-      List<MediaModel> AcceptedModels = new List<MediaModel>();
 
       foreach (var file in files)
       {
