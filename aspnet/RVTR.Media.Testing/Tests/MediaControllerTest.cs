@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -75,6 +76,44 @@ namespace RVTR.Media.Testing.Tests
       var resultPass = await _controller.Post(files, group, groupidentifier);
 
       Assert.NotNull(resultPass);
+    }
+
+    [Fact]
+    public async void Test_Contoller_Post_BadFileType()
+    {
+      var fileMock = new Mock<IFormFile>();
+      var content = "Hello World from a Fake File";
+      var fileName = "test.pdf";
+      var ms = new MemoryStream();
+      var writer = new StreamWriter(ms);
+      writer.Write(content);
+      writer.Flush();
+      ms.Position = 0;
+      fileMock.Setup(_ => _.OpenReadStream()).Returns(ms);
+      fileMock.Setup(_ => _.FileName).Returns(fileName);
+      fileMock.Setup(_ => _.Length).Returns(ms.Length);
+
+      var resultFail = await _controller.Post(new FormFileCollection { fileMock.Object }, "campgrounds", "camplazlo");
+      Assert.IsType<BadRequestObjectResult>(resultFail);
+    }
+
+    [Fact]
+    public async void Test_Contoller_Post_BadFileSize()
+    {
+      var fileMock = new Mock<IFormFile>();
+      var content = "Hello World from a Fake File";
+      var fileName = "test.png";
+      var ms = new MemoryStream();
+      var writer = new StreamWriter(ms);
+      writer.Write(content);
+      writer.Flush();
+      ms.Position = 0;
+      fileMock.Setup(_ => _.OpenReadStream()).Returns(ms);
+      fileMock.Setup(_ => _.FileName).Returns(fileName);
+      fileMock.Setup(_ => _.Length).Returns(ms.Length + 1000000000000);
+
+      var resultFail = await _controller.Post(new FormFileCollection { fileMock.Object }, "campgrounds", "camplazlo");
+      Assert.IsType<BadRequestObjectResult>(resultFail);
     }
   }
 }
