@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Cors;
@@ -53,13 +54,13 @@ namespace RVTR.Media.Service.Controllers
       {
         _logger.LogDebug("deleting media");
 
-        var mediaModel = (await _unitOfWork.Media.SelectAsync(e => e.EntityId == id)).FirstOrDefault();
+        var mediaModel = (await _unitOfWork.Media.SelectAsync(e => e.EntityId == mediaId)).FirstOrDefault();
 
         await _unitOfWork.Media.DeleteAsync(mediaModel.EntityId); //look at this
         BlobClient blob = new BlobClient(new System.Uri(mediaModel.Uri));
         await blob.DeleteAsync();
 
-        await _unitOfWork.Media.DeleteAsync(mediaModel.MediaId);
+        await _unitOfWork.Media.DeleteAsync(mediaModel.EntityId);
         await _unitOfWork.CommitAsync();
 
 
@@ -86,7 +87,7 @@ namespace RVTR.Media.Service.Controllers
     {
       _logger.LogInformation($"retrieve media");
 
-      return Ok(await _unitOfWork.Media.SelectAsync(groupidentifier));
+      return Ok(await _unitOfWork.Media.SelectAsync(x => x.GroupIdentifier == groupidentifier));
     }
 
 

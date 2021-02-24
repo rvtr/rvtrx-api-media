@@ -9,11 +9,6 @@ namespace RVTR.Media.Domain.Models
   /// </summary>
   public class MediaModel : AEntity, IValidatableObject
   {
-<<<<<<< HEAD
-=======
-    public long MediaId { get; set; }
-
->>>>>>> fixed cosmos connection, changed mediaId to long
     [Required(ErrorMessage = "Group is required")]
     [RegularExpression(@"(profiles|campgrounds|campsites)", ErrorMessage = "Group affiliation not recognized.")]
     public string Group { get; set; }
