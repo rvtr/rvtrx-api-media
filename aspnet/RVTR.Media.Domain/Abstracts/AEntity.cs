@@ -6,10 +6,12 @@ namespace RVTR.Media.Domain.Abstracts
   public abstract class AEntity
   {
     public long EntityId { get; set; }
+    public string id { get; set; }
 
     public AEntity()
     {
-      EntityId = System.DateTime.Now.Ticks;
+      id = System.DateTime.Now.Ticks.ToString();
+      EntityId = long.Parse(id);
     }
   }
 }

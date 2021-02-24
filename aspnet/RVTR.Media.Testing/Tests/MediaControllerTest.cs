@@ -44,8 +44,8 @@ namespace RVTR.Media.Testing.Tests
       var unitOfWorkMock = new Mock<IUnitOfWork>();
       var configurationMock = new Mock<IConfiguration>();
 
-      repositoryMock.Setup(m => m.DeleteAsync(0)).Throws(new Exception());
-      repositoryMock.Setup(m => m.DeleteAsync(1)).Returns(Task.CompletedTask);
+      repositoryMock.Setup(m => m.DeleteAsync("0")).Throws(new Exception());
+      repositoryMock.Setup(m => m.DeleteAsync("1")).Returns(Task.CompletedTask);
       repositoryMock.Setup(m => m.InsertAsync(It.IsAny<MediaModel>())).Returns(Task.CompletedTask);
       repositoryMock.Setup(m => m.SelectAsync()).ReturnsAsync((IEnumerable<MediaModel>)null);
       repositoryMock.Setup(m => m.SelectAsync(e => e.EntityId == 0)).Throws(new Exception());
@@ -62,8 +62,8 @@ namespace RVTR.Media.Testing.Tests
     [Fact]
     public async void Test_Controller_Delete()
     {
-      var resultFail = await _controller.Delete(0);
-      var resultPass = await _controller.Delete(1);
+      var resultFail = await _controller.Delete("0");
+      var resultPass = await _controller.Delete("1");
 
       Assert.NotNull(resultFail);
       Assert.NotNull(resultPass);

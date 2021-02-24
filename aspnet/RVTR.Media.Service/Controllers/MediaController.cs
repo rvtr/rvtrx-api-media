@@ -48,24 +48,27 @@ namespace RVTR.Media.Service.Controllers
     [HttpDelete("{mediaId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(long mediaId)
+    public async Task<IActionResult> Delete(string mediaId)
     {
       try
       {
         _logger.LogDebug("deleting media");
 
-        var mediaModel = (await _unitOfWork.Media.SelectAsync(e => e.EntityId == mediaId)).FirstOrDefault();
+        var mediaModel = (await _unitOfWork.Media.SelectAsync(e => e.id == mediaId)).First();
 
-        BlobClient blob = new BlobClient(new System.Uri(mediaModel.Uri));
-        await blob.DeleteAsync();
+        string blobName = mediaModel.Uri.Substring(mediaModel.Uri.LastIndexOf('/') + 1);
 
-        await _unitOfWork.Media.DeleteAsync(mediaModel.EntityId);
+        BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("storage"));
+        BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(mediaModel.Group);
+        await containerClient.DeleteBlobIfExistsAsync(blobName);
+
+        await _unitOfWork.Media.DeleteAsync(mediaModel.id);
         await _unitOfWork.CommitAsync();
 
 
         _logger.LogInformation($"deleted media");
 
-        return Ok();
+        return Ok(mediaModel);
       }
       catch
       {
