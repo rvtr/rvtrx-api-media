@@ -17,7 +17,7 @@ namespace RVTR.Media.Domain.Interfaces
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    Task DeleteAsync(int id);
+    Task DeleteAsync(long id);
 
     /// <summary>
     ///

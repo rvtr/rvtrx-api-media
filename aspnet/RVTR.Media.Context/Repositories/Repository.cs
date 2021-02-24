@@ -31,7 +31,7 @@ namespace RVTR.Media.Context.Repositories
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public virtual async Task DeleteAsync(int id) => _dbSet.Remove((await SelectAsync(e => e.EntityId == id)).FirstOrDefault());
+    public virtual async Task DeleteAsync(long id) => _dbSet.Remove((await SelectAsync(e => e.EntityId == id)).FirstOrDefault());
 
     /// <summary>
     ///
