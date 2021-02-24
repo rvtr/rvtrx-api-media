@@ -29,11 +29,11 @@ namespace RVTR.Media.Testing.Tests
         {
 
         },
-        new string("Hello World from a Fake File")
+        new string("campgrounds")
         {
 
         },
-        new string("test.pdf")
+        new string("camplazlo")
       }
     };
 
@@ -71,11 +71,11 @@ namespace RVTR.Media.Testing.Tests
 
     [Theory]
     [MemberData(nameof(Medias))]
-    public async void Test_Controller_Post(IFormFileCollection files, string group, string groupidentifier)
+    public async void Test_Controller_Post_EmptyFile(IFormFileCollection files, string group, string groupidentifier)
     {
-      var resultPass = await _controller.Post(files, group, groupidentifier);
+      var resultFail = await _controller.Post(files, group, groupidentifier);
 
-      Assert.NotNull(resultPass);
+      Assert.IsType<BadRequestObjectResult>(resultFail);
     }
 
     [Fact]
