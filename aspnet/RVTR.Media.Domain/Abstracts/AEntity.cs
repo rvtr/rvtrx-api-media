@@ -8,7 +8,7 @@ namespace RVTR.Media.Domain.Abstracts
     public long EntityId { get; set; }
     public string id { get; set; }
 
-    public AEntity()
+    protected AEntity()
     {
       id = System.DateTime.Now.Ticks.ToString();
       EntityId = long.Parse(id);
