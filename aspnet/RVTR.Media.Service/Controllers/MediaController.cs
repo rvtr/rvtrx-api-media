@@ -48,7 +48,7 @@ namespace RVTR.Media.Service.Controllers
     [HttpDelete("{mediaId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(int mediaId)
+    public async Task<IActionResult> Delete(long mediaId)
     {
       try
       {
@@ -103,6 +103,11 @@ namespace RVTR.Media.Service.Controllers
     public async Task<IActionResult> Post([FromForm] IFormFileCollection files, string group, string groupidentifier)
     {
       Regex FileExtensionRegex = new Regex(@"([a-zA-Z0-9\s_\.-:])+\.(png|jpg)$");
+
+      if(files.Count() < 1)
+      {
+        return BadRequest("No files given");
+      }
 
       foreach (var file in files)
       {
