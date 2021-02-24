@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using RVTR.Media.Domain.Interfaces;
 using RVTR.Media.Domain.Models;
@@ -14,10 +13,13 @@ namespace RVTR.Media.Context.Repositories
 
     public IRepository<MediaModel> Media { get; }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="context"></param>
     public UnitOfWork(MediaContext context)
     {
       _context = context;
-
       Media = new Repository<MediaModel>(context);
     }
 

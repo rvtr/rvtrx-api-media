@@ -8,7 +8,7 @@ namespace RVTR.Media.Testing.Tests
 {
   public class RepositoryTest : DataTest
   {
-    private readonly MediaModel _media = new MediaModel() { MediaId = 3 };
+    private readonly MediaModel _media = new MediaModel() { EntityId = 3 };
 
     [Fact]
     public async void Test_Repository_InsertAsync()

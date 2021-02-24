@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
@@ -46,9 +47,9 @@ namespace RVTR.Media.Service.Controllers
       {
         _logger.LogDebug("deleting media");
 
-        var mediaModel = await _unitOfWork.Media.SelectAsync(id);
+        var mediaModel = (await _unitOfWork.Media.SelectAsync(e => e.EntityId == id)).FirstOrDefault();
 
-        await _unitOfWork.Media.DeleteAsync(mediaModel.MediaId);
+        await _unitOfWork.Media.DeleteAsync(mediaModel.EntityId);
         await _unitOfWork.CommitAsync();
 
 
@@ -90,7 +91,7 @@ namespace RVTR.Media.Service.Controllers
     {
       _logger.LogDebug("retrieving media");
 
-      var mediaModel = await _unitOfWork.Media.SelectAsync(id);
+      var mediaModel = (await _unitOfWork.Media.SelectAsync(e => e.EntityId == id)).FirstOrDefault();
 
       if (mediaModel is MediaModel thatMedia)
       {

@@ -1,15 +1,14 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using RVTR.Media.Domain.Abstracts;
 
 namespace RVTR.Media.Domain.Models
 {
   /// <summary>
-  /// Represents the _Media_ model
+  /// Represents the _MediaModel_ class
   /// </summary>
-  public class MediaModel : IValidatableObject
+  public class MediaModel : AEntity, IValidatableObject
   {
-    public int MediaId { get; set; }
-
     [Required(ErrorMessage = "Group is required")]
     [RegularExpression(@"(profiles|campgrounds|campsites)", ErrorMessage = "Group affiliation not recognized.")]
     public string Group { get; set; }
@@ -25,41 +24,31 @@ namespace RVTR.Media.Domain.Models
     public string AltText { get; set; }
 
     /// <summary>
-    /// Empty constructor
-    /// </summary>
-    public MediaModel() { }
-
-
-    /// <summary>
-    /// Represents the _Media_ `Validate` method
+    /// Represents the _MediaModel_ `Validate` method
     /// </summary>
     /// <param name="validationContext"></param>
     /// <returns>List of Validation result</returns>
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-      List<ValidationResult> result = new List<ValidationResult>();
-
       if (string.IsNullOrEmpty(Group))
       {
-        result.Add(new ValidationResult("Group can not be null."));
+        yield return new ValidationResult("Group can not be null.");
       }
 
       if (string.IsNullOrEmpty(GroupIdentifier))
       {
-        result.Add(new ValidationResult("GroupIdentifier can not be null."));
+        yield return new ValidationResult("GroupIdentifier can not be null.");
       }
 
       if (string.IsNullOrEmpty(Uri))
       {
-        result.Add(new ValidationResult("URL can not be null."));
+        yield return new ValidationResult("URL can not be null.");
       }
 
       if (string.IsNullOrEmpty(AltText))
       {
-        result.Add(new ValidationResult("AltText can not be null."));
+        yield return new ValidationResult("AltText can not be null.");
       }
-
-      return result;
     }
   }
 }
