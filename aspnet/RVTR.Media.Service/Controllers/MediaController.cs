@@ -56,7 +56,6 @@ namespace RVTR.Media.Service.Controllers
 
         var mediaModel = (await _unitOfWork.Media.SelectAsync(e => e.EntityId == mediaId)).FirstOrDefault();
 
-        await _unitOfWork.Media.DeleteAsync(mediaModel.EntityId); //look at this
         BlobClient blob = new BlobClient(new System.Uri(mediaModel.Uri));
         await blob.DeleteAsync();
 
