@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <DebugType>Full</DebugType>
@@ -8,6 +8,7 @@
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <TargetFramework>net5.0</TargetFramework>
     <Version>0.0.0</Version>
+    <UserSecretsId>f0a1b6b3-9ecd-475a-80c3-fd57cbac825c</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

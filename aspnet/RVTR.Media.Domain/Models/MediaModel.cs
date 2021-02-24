@@ -34,17 +34,14 @@ namespace RVTR.Media.Domain.Models
       {
         yield return new ValidationResult("Group can not be null.");
       }
-
       if (string.IsNullOrEmpty(GroupIdentifier))
       {
         yield return new ValidationResult("GroupIdentifier can not be null.");
       }
-
       if (string.IsNullOrEmpty(Uri))
       {
         yield return new ValidationResult("URL can not be null.");
       }
-
       if (string.IsNullOrEmpty(AltText))
       {
         yield return new ValidationResult("AltText can not be null.");

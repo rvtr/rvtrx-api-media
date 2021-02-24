@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RVTR.Media.Domain.Interfaces;
 using RVTR.Media.Domain.Models;
@@ -22,40 +25,50 @@ namespace RVTR.Media.Service.Controllers
     private readonly ILogger<MediaController> _logger;
     private readonly IUnitOfWork _unitOfWork;
 
+    private readonly IConfiguration _configuration;
+
     /// <summary>
     ///
     /// </summary>
     /// <param name="logger"></param>
     /// <param name="unitOfWork"></param>
-    public MediaController(ILogger<MediaController> logger, IUnitOfWork unitOfWork)
+    /// <param name="configuration"></param>
+    public MediaController(ILogger<MediaController> logger, IUnitOfWork unitOfWork, IConfiguration configuration)
     {
       _logger = logger;
       _unitOfWork = unitOfWork;
+      _configuration = configuration;
     }
 
     /// <summary>
     ///
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="mediaId"></param>
     /// <returns></returns>
-    [HttpDelete("{id}")]
+    [HttpDelete("{mediaId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(string mediaId)
     {
       try
       {
         _logger.LogDebug("deleting media");
 
-        var mediaModel = (await _unitOfWork.Media.SelectAsync(e => e.EntityId == id)).FirstOrDefault();
+        var mediaModel = (await _unitOfWork.Media.SelectAsync(e => e.id == mediaId)).First();
 
-        await _unitOfWork.Media.DeleteAsync(mediaModel.EntityId);
+        string blobName = mediaModel.Uri.Substring(mediaModel.Uri.LastIndexOf('/') + 1);
+
+        BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("storage"));
+        BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(mediaModel.Group);
+        await containerClient.DeleteBlobIfExistsAsync(blobName);
+
+        await _unitOfWork.Media.DeleteAsync(mediaModel.id);
         await _unitOfWork.CommitAsync();
 
 
         _logger.LogInformation($"deleted media");
 
-        return Ok();
+        return Ok(mediaModel);
       }
       catch
       {
@@ -68,92 +81,94 @@ namespace RVTR.Media.Service.Controllers
     /// <summary>
     ///
     /// </summary>
+    /// <param name="groupidentifier"></param>
     /// <returns></returns>
-    [HttpGet]
+    [HttpGet("{groupidentifier}")]
     [ProducesResponseType(typeof(IEnumerable<MediaModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> Get(string groupidentifier)
     {
       _logger.LogInformation($"retrieve media");
 
-      return Ok(await _unitOfWork.Media.SelectAsync());
-
+      return Ok(await _unitOfWork.Media.SelectAsync(x => x.GroupIdentifier == groupidentifier));
     }
+
 
     /// <summary>
     ///
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="files"></param>
+    /// <param name="group"></param>
+    /// <param name="groupidentifier"></param>
     /// <returns></returns>
-    [HttpGet("{id}")]
-    [ProducesResponseType(typeof(MediaModel), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Get(int id)
-    {
-      _logger.LogDebug("retrieving media");
-
-      var mediaModel = (await _unitOfWork.Media.SelectAsync(e => e.EntityId == id)).FirstOrDefault();
-
-      if (mediaModel is MediaModel thatMedia)
-      {
-        _logger.LogInformation($"retrieved media");
-
-        return Ok(thatMedia);
-      }
-
-      _logger.LogWarning($"missing media");
-
-      return NotFound();
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="media"></param>
-    /// <returns></returns>
-    [HttpPost]
+    [HttpPost("{group}/{groupidentifier}")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
-    public async Task<IActionResult> Post([FromBody] MediaModel media)
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Post([FromForm] IFormFileCollection files, string group, string groupidentifier)
     {
+      Regex FileExtensionRegex = new Regex(@"([a-zA-Z0-9\s_\.-:])+\.(png|jpg)$");
 
-      _logger.LogDebug("adding media");
-
-      await _unitOfWork.Media.InsertAsync(media);
-      await _unitOfWork.CommitAsync();
-
-      _logger.LogInformation($"added media");
-
-      return Accepted(media);
-
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="media"></param>
-    /// <returns></returns>
-    [HttpPut]
-    [ProducesResponseType(StatusCodes.Status202Accepted)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Put([FromBody] MediaModel media)
-    {
-      try
+      if(!files.Any())
       {
-        _logger.LogDebug("updating media");
-
-        _unitOfWork.Media.Update(media);
-        await _unitOfWork.CommitAsync();
-
-        _logger.LogInformation($"updated media");
-
-        return Accepted(media);
+        return BadRequest("No files given");
       }
 
-      catch
+      foreach (var file in files)
       {
-        _logger.LogWarning($"missing media");
-
-        return NotFound();
+        if (file.Length > (5 * 1024 * 1024))
+        {
+          return BadRequest("File too large");
+        }
+        if (!FileExtensionRegex.IsMatch(file.FileName))
+        {
+          return BadRequest("Invalid file extention");
+        }
       }
+      foreach (var file in files)
+      {
+        BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("storage"));
+
+        string FileExtention = file.FileName.Substring(file.FileName.Length - 4);
+
+        MediaModel model = new MediaModel();
+        model.Group = group;
+        model.GroupIdentifier = groupidentifier;
+
+        switch (group)
+        {
+          case "profiles":
+          case "campgrounds":
+          case "campsites":
+            {
+              _logger.LogDebug("uploading media");
+
+              BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(model.Group);
+              BlobClient blobClient = containerClient.GetBlobClient(model.GroupIdentifier + System.Guid.NewGuid().ToString() + FileExtention);
+
+              await blobClient.UploadAsync(file.OpenReadStream());
+
+              _logger.LogDebug("uploaded media");
+
+              model.Uri = blobClient.Uri.ToString();
+              model.AltText = "Picture of " + model.GroupIdentifier;
+
+              _logger.LogDebug("adding media model");
+
+              await _unitOfWork.Media.InsertAsync(model);
+              await _unitOfWork.CommitAsync();
+
+              _logger.LogInformation($"added media model");
+
+              break;
+            }
+
+          default:
+            {
+              return BadRequest("Invalid group entered");
+            }
+        }
+      }
+
+      return Accepted();
     }
   }
 }

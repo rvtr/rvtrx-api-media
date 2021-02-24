@@ -8,6 +8,8 @@ services:
       dockerfile: ../.docker/machine.dockerfile
     depends_on:
       - data
+    env_file:
+      - ../../docker.env
     environment:
       ConnectionStrings__pgsql: 'Host=data;Database=MediaData;Username=postgres;Password=MediaData@2020;'
       ConnectionStrings__zipkin: 'http://trace:9411/'
