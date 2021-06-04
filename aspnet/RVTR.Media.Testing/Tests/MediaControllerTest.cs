@@ -126,6 +126,23 @@ namespace RVTR.Media.Testing.Tests
       Assert.NotNull(resultPass);
     }
 
+    [Fact]
+    public async void Test_Contoller_Post_BadAudioSize()
+    {
+      var fileMock = new Mock<IFormFile>();
+      var content = "testing";
+      var fileName = "test.mp3";
+      var ms = new MemoryStream();
+      var writer = new StreamWriter(ms);
+      writer.Write(content);
+      writer.Flush();
+      ms.Position = 0;
+      fileMock.Setup(_ => _.OpenReadStream()).Returns(ms);
+      fileMock.Setup(_ => _.FileName).Returns(fileName);
+      fileMock.Setup(_ => _.Length).Returns(ms.Length + 1000000000000);
 
+      var resultFail = await _controller.Post(new FormFileCollection { fileMock.Object }, "campgrounds", "camplazlo");
+      Assert.IsType<BadRequestObjectResult>(resultFail);
+    }
   }
 }
