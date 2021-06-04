@@ -105,23 +105,40 @@ namespace RVTR.Media.Service.Controllers
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Post([FromForm] IFormFileCollection files, string group, string groupidentifier)
     {
-      Regex FileExtensionRegex = new Regex(@"([a-zA-Z0-9\s_\.-:])+\.(png|jpg)$");
+      Regex FileNameRegex = new Regex(@"([a-zA-Z0-9\s_\.-:])+\.+.*$");
+      Regex PictureRegexExtension = new Regex(@"^.*\.(jpg|JPG|gif|GIF|png|PNG)$");
+      Regex AudioRegexExtension = new Regex(@"^.*\.(mp3|wav|FLAC|flac|WAV|MP3)$");
 
-      if(!files.Any())
+      if (!files.Any())
       {
         return BadRequest("No files given");
       }
 
       foreach (var file in files)
       {
-        if (file.Length > (5 * 1024 * 1024))
+        if (!FileNameRegex.IsMatch(file.FileName))
         {
-          return BadRequest("File too large");
+          return BadRequest("Invalid file name");
         }
-        if (!FileExtensionRegex.IsMatch(file.FileName))
+        if ((!PictureRegexExtension.IsMatch(file.FileName)) && (!AudioRegexExtension.IsMatch(file.FileName)))
         {
           return BadRequest("Invalid file extention");
         }
+        if (PictureRegexExtension.IsMatch(file.FileName))
+        {
+          if (file.Length > (5 * 1024 * 1024))
+          {
+            return BadRequest("File too large (5mb Max)");
+          }
+        }
+        if (AudioRegexExtension.IsMatch(file.FileName))
+        {
+          if (file.Length > (12 * 1024 * 1024))
+          {
+            return BadRequest("File too large (12mb Max)");
+          }
+        }
+
       }
       foreach (var file in files)
       {
@@ -135,6 +152,7 @@ namespace RVTR.Media.Service.Controllers
 
         switch (group)
         {
+          case "audio":
           case "profiles":
           case "campgrounds":
           case "campsites":
@@ -149,8 +167,14 @@ namespace RVTR.Media.Service.Controllers
               _logger.LogDebug("uploaded media");
 
               model.Uri = blobClient.Uri.ToString();
-              model.AltText = "Picture of " + model.GroupIdentifier;
-
+              if (group != "audio")
+              {
+                model.AltText = "Picture of " + model.GroupIdentifier;
+              }
+              else
+              {
+                model.AltText = "Audio of " + model.GroupIdentifier;
+              }
               _logger.LogDebug("adding media model");
 
               await _unitOfWork.Media.InsertAsync(model);
@@ -160,7 +184,6 @@ namespace RVTR.Media.Service.Controllers
 
               break;
             }
-
           default:
             {
               return BadRequest("Invalid group entered");
