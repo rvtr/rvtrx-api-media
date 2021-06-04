@@ -20,5 +20,28 @@ namespace RVTR.Media.Testing.Tests
         Assert.Equal(EntityState.Added, ctx.Entry(_media).State);
       }
     }
+
+    [Fact]
+    public async void Test_Repository_SelectAsync()
+    {
+      using (var ctx = new MediaContext(Options))
+      {
+        var medias = new Repository<MediaModel>(ctx);
+        var result = await medias.SelectAsync();
+        Assert.NotNull(result);
+      }
+    }
+
+    [Fact]
+    public void Test_Repository_Update()
+    {
+      using (var ctx = new MediaContext(Options))
+      {
+        MediaModel temp = new MediaModel() { EntityId = 3 };
+        var medias = new Repository<MediaModel>(ctx);
+        medias.Update(temp);
+        Assert.Equal(EntityState.Modified, ctx.Entry(temp).State);
+      }
+    }
   }
 }
