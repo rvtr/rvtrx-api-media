@@ -61,6 +61,7 @@ namespace RVTR.Media.Context.Repositories
         {
           await navigation.LoadAsync();
         }
+        entity.EntityId = 0;
       }
 
       return entities;
