@@ -106,8 +106,9 @@ namespace RVTR.Media.Service.Controllers
     public async Task<IActionResult> Post([FromForm] IFormFileCollection files, string group, string groupidentifier)
     {
       Regex FileNameRegex = new Regex(@"([a-zA-Z0-9\s_\.-:])+\.+.*$");
-      Regex PictureRegexExtension = new Regex(@"^.*\.(jpg|JPG|gif|GIF|png|PNG)$");
-      Regex AudioRegexExtension = new Regex(@"^.*\.(mp3|wav|FLAC|flac|WAV|MP3)$");
+      Regex PictureRegexExtension = new Regex(@"^.*\.(jpg|JPG|gif|GIF|png|PNG|jpeg|JPEG)$");
+      Regex AudioRegexExtension = new Regex(@"^.*\.(mp3|wav|WAV|MP3|flac|FLAC)$");
+      Regex Extensions = new Regex(@"\.(mp3|wav|WAV|MP3|jpg|JPG|gif|GIF|png|PNG|flac|FLAC|jpeg|JPEG)$");
 
       if (!files.Any())
       {
@@ -142,9 +143,11 @@ namespace RVTR.Media.Service.Controllers
       }
       foreach (var file in files)
       {
+        Match extensionmatch = Extensions.Match(file.FileName);
+        string extension = extensionmatch.ToString();
+
         BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("storage"));
 
-        string FileExtention = file.FileName.Substring(file.FileName.Length - 4);
 
         MediaModel model = new MediaModel();
         model.Group = group;
@@ -160,18 +163,18 @@ namespace RVTR.Media.Service.Controllers
               _logger.LogDebug("uploading media");
 
               BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(model.Group);
-              BlobClient blobClient = containerClient.GetBlobClient(model.GroupIdentifier + System.Guid.NewGuid().ToString() + FileExtention);
+              BlobClient blobClient = containerClient.GetBlobClient(model.GroupIdentifier + System.Guid.NewGuid().ToString() + extension);
 
               await blobClient.UploadAsync(file.OpenReadStream());
 
               _logger.LogDebug("uploaded media");
 
               model.Uri = blobClient.Uri.ToString();
-              if (group != "audio")
+              if (PictureRegexExtension.IsMatch(file.FileName))
               {
                 model.AltText = "Picture of " + model.GroupIdentifier;
               }
-              else
+              else if (AudioRegexExtension.IsMatch(file.FileName))
               {
                 model.AltText = "Audio of " + model.GroupIdentifier;
               }
