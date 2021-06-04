@@ -115,5 +115,35 @@ namespace RVTR.Media.Testing.Tests
       var resultFail = await _controller.Post(new FormFileCollection { fileMock.Object }, "campgrounds", "camplazlo");
       Assert.IsType<BadRequestObjectResult>(resultFail);
     }
+
+    [Fact]
+    public async void Test_Controller_Get()
+    {
+      var resultFail = await _controller.Get("0");
+      var resultPass = await _controller.Get("1");
+
+      Assert.NotNull(resultFail);
+      Assert.NotNull(resultPass);
+    }
+
+    [Fact]
+    public async void Test_Contoller_Post_GoodFileType()
+    {
+      var fileMock = new Mock<IFormFile>();
+      var content = "Hello World from a good File";
+      var fileName = "test.png";
+      var ms = new MemoryStream();
+      var writer = new StreamWriter(ms);
+      writer.Write(content);
+      writer.Flush();
+      ms.Position = 0;
+      fileMock.Setup(_ => _.OpenReadStream()).Returns(ms);
+      fileMock.Setup(_ => _.FileName).Returns(fileName);
+      fileMock.Setup(_ => _.Length).Returns(ms.Length);
+
+      var result = await _controller.Post(new FormFileCollection { fileMock.Object }, "profiles", "camplazlo");
+      Assert.IsType<ActionResult>(result);
+    }
+    c
   }
 }
