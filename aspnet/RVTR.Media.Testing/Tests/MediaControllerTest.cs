@@ -115,5 +115,17 @@ namespace RVTR.Media.Testing.Tests
       var resultFail = await _controller.Post(new FormFileCollection { fileMock.Object }, "campgrounds", "camplazlo");
       Assert.IsType<BadRequestObjectResult>(resultFail);
     }
+
+    [Fact]
+    public async void Test_Controller_Get()
+    {
+      var resultFail = await _controller.Get("0");
+      var resultPass = await _controller.Get("1");
+
+      Assert.NotNull(resultFail);
+      Assert.NotNull(resultPass);
+    }
+
+
   }
 }
