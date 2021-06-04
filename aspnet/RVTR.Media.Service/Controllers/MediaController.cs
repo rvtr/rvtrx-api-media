@@ -141,12 +141,13 @@ namespace RVTR.Media.Service.Controllers
         }
 
       }
+      BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("storage"));
       foreach (var file in files)
       {
         Match extensionmatch = Extensions.Match(file.FileName);
         string extension = extensionmatch.ToString();
 
-        BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("storage"));
+
 
 
         MediaModel model = new MediaModel();
