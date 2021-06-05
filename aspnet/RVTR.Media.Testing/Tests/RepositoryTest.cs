@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using RVTR.Media.Context;
 using RVTR.Media.Context.Repositories;
@@ -26,19 +27,22 @@ namespace RVTR.Media.Testing.Tests
     {
       using (var ctx = new MediaContext(Options))
       {
+        MediaModel temp = new MediaModel() { EntityId = 3 };
         var medias = new Repository<MediaModel>(ctx);
+        await medias.InsertAsync(temp);
         var result = await medias.SelectAsync();
         Assert.NotNull(result);
       }
     }
 
     [Fact]
-    public void Test_Repository_Update()
+    public async Task Test_Repository_UpdateAsync()
     {
       using (var ctx = new MediaContext(Options))
       {
         MediaModel temp = new MediaModel() { EntityId = 3 };
         var medias = new Repository<MediaModel>(ctx);
+        await medias.InsertAsync(temp);
         medias.Update(temp);
         Assert.Equal(EntityState.Modified, ctx.Entry(temp).State);
       }

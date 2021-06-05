@@ -52,7 +52,7 @@ namespace RVTR.Media.Testing.Tests
       repositoryMock.Setup(m => m.SelectAsync(e => e.EntityId == 1)).ReturnsAsync((IEnumerable<MediaModel>)null);
       repositoryMock.Setup(m => m.Update(It.IsAny<MediaModel>()));
       unitOfWorkMock.Setup(m => m.Media).Returns(repositoryMock.Object);
-
+      
       _logger = loggerMock.Object;
       _unitOfWork = unitOfWorkMock.Object;
       _configuration = configurationMock.Object;
