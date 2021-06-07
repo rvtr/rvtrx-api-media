@@ -1,3 +1,5 @@
+using System;
+
 namespace RVTR.Media.Domain.Abstracts
 {
   /// <summary>
@@ -5,7 +7,7 @@ namespace RVTR.Media.Domain.Abstracts
   /// </summary>
   public abstract class AEntity
   {
-    public long EntityId { get; set; }
+    public Nullable<long> EntityId { get; set; }
     public string id { get; set; }
 
     protected AEntity()
