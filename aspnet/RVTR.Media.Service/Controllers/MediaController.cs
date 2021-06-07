@@ -89,7 +89,14 @@ namespace RVTR.Media.Service.Controllers
     {
       _logger.LogInformation($"retrieve media");
 
-      return Ok(await _unitOfWork.Media.SelectAsync(x => x.GroupIdentifier == groupidentifier));
+      var results = await _unitOfWork.Media.SelectAsync(x => x.GroupIdentifier == groupidentifier);
+
+      foreach (var result in results)
+      {
+        result.EntityId = null;
+      }
+
+      return Ok(results);
     }
 
 
@@ -107,7 +114,7 @@ namespace RVTR.Media.Service.Controllers
     {
       Regex FileExtensionRegex = new Regex(@"([a-zA-Z0-9\s_\.-:])+\.(png|jpg)$");
 
-      if(!files.Any())
+      if (!files.Any())
       {
         return BadRequest("No files given");
       }
