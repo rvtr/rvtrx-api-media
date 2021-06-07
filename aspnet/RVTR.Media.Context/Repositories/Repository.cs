@@ -47,7 +47,7 @@ namespace RVTR.Media.Context.Repositories
     public virtual async Task<IEnumerable<TEntity>> SelectAsync() => await _dbSet.ToListAsync();
 
     /// <summary>
-    ///
+    /// expression is named predicate
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
