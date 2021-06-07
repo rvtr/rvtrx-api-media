@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
+using Microsoft.AspNetCore.Http;
 using RVTR.Media.Domain.Abstracts;
+using RVTR.Media.Domain.Models;
 
 namespace RVTR.Media.Domain.Interfaces
 {
@@ -44,5 +47,7 @@ namespace RVTR.Media.Domain.Interfaces
     /// </summary>
     /// <param name="entry"></param>
     void Update(TEntity entry);
+
+    Task UploadAsync(IFormFile file, MediaModel entry, BlobServiceClient blobServiceClient);
   }
 }

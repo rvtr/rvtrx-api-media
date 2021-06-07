@@ -105,6 +105,7 @@ namespace RVTR.Media.Service.Controllers
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Post([FromForm] IFormFileCollection files, string group, string groupidentifier)
     {
+      BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("storage"));
       Regex FileExtensionRegex = new Regex(@"([a-zA-Z0-9\s_\.-:])+\.(png|jpg)$");
 
       if(!files.Any())
@@ -123,12 +124,10 @@ namespace RVTR.Media.Service.Controllers
           return BadRequest("Invalid file extention");
         }
       }
+      
       foreach (var file in files)
       {
-        BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("storage"));
-
-        string FileExtention = file.FileName.Substring(file.FileName.Length - 4);
-
+  
         MediaModel model = new MediaModel();
         model.Group = group;
         model.GroupIdentifier = groupidentifier;
@@ -141,14 +140,10 @@ namespace RVTR.Media.Service.Controllers
             {
               _logger.LogDebug("uploading media");
 
-              BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(model.Group);
-              BlobClient blobClient = containerClient.GetBlobClient(model.GroupIdentifier + System.Guid.NewGuid().ToString() + FileExtention);
-
-              await blobClient.UploadAsync(file.OpenReadStream());
+              await _unitOfWork.Media.UploadAsync(file, model, blobServiceClient);
 
               _logger.LogDebug("uploaded media");
 
-              model.Uri = blobClient.Uri.ToString();
               model.AltText = "Picture of " + model.GroupIdentifier;
 
               _logger.LogDebug("adding media model");

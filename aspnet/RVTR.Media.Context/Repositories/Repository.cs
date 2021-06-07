@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using RVTR.Media.Domain.Abstracts;
 using RVTR.Media.Domain.Interfaces;
+using RVTR.Media.Domain.Models;
 
 namespace RVTR.Media.Context.Repositories
 {
@@ -16,6 +20,9 @@ namespace RVTR.Media.Context.Repositories
   public class Repository<TEntity> : IRepository<TEntity> where TEntity : AEntity
   {
     private readonly DbSet<TEntity> _dbSet;
+    
+
+    private readonly MediaContext _context;
 
     /// <summary>
     ///
@@ -24,6 +31,8 @@ namespace RVTR.Media.Context.Repositories
     public Repository(MediaContext context)
     {
       _dbSet = context.Set<TEntity>();
+      _context = context;
+     
     }
 
     /// <summary>
@@ -38,7 +47,29 @@ namespace RVTR.Media.Context.Repositories
     /// </summary>
     /// <param name="entry"></param>
     /// <returns></returns>
-    public virtual async Task InsertAsync(TEntity entry) => await _dbSet.AddAsync(entry).ConfigureAwait(true);
+    public virtual async Task InsertAsync(TEntity entry){
+
+      await _dbSet.AddAsync(entry).ConfigureAwait(true);
+    } 
+
+    public virtual async Task UploadAsync(IFormFile file,MediaModel entry, BlobServiceClient blobServiceClient )
+    {
+      var containerName = entry.Group;
+      var fileName = file.FileName;
+      string FileExtention = fileName.Substring(fileName.Length - 4);
+      var blopName = entry.GroupIdentifier + System.Guid.NewGuid().ToString() + FileExtention;
+      var blobClient = _GetBlobClient(containerName, blopName, blobServiceClient);
+      await blobClient.UploadAsync(file.OpenReadStream());
+      entry.Uri = blobClient.Uri.ToString();
+      await _context.Medias.AddAsync(entry);
+
+    }
+
+    private static BlobClient _GetBlobClient(string containerName, string blobName, BlobServiceClient blobServiceClient)
+    {
+      var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+      return containerClient.GetBlobClient(blobName);
+    }
 
     /// <summary>
     ///

@@ -5,7 +5,7 @@ WORKDIR /workspace
 
 COPY . .
 
-RUN dotnet restore
+RUN dotnet restore --force-evaluate
 RUN dotnet build --no-restore
 RUN dotnet publish --configuration Debug --no-build --output out RVTR.Media.Service/*.csproj
 
