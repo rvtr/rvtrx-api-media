@@ -101,6 +101,7 @@ namespace RVTR.Media.Service.Controllers
     /// <param name="groupidentifier"></param>
     /// <returns></returns>
     [HttpPost("{group}/{groupidentifier}")]
+    [RequestSizeLimit(100 * 1024 * 1024)]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Post([FromForm] IFormFileCollection files, string group, string groupidentifier)
@@ -108,7 +109,8 @@ namespace RVTR.Media.Service.Controllers
       Regex FileNameRegex = new Regex(@"([a-zA-Z0-9\s_\.-:])+\.+.*$");
       Regex PictureRegexExtension = new Regex(@"^.*\.(jpg|JPG|gif|GIF|png|PNG|jpeg|JPEG)$");
       Regex AudioRegexExtension = new Regex(@"^.*\.(mp3|wav|WAV|MP3|flac|FLAC)$");
-      Regex Extensions = new Regex(@"\.(mp3|wav|WAV|MP3|jpg|JPG|gif|GIF|png|PNG|flac|FLAC|jpeg|JPEG)$");
+      Regex VideoRegexExtension = new Regex(@"^.*\.(mp4|MP4|MOV|mov|WMV|wmv|AVI|avi|WEBM|webm)$");
+      Regex Extensions = new Regex(@"\.(mp3|wav|WAV|MP3|jpg|JPG|gif|GIF|png|PNG|flac|FLAC|jpeg|JPEG|mp4|MP4|MOV|mov|WMV|wmv|AVI|avi|WEBM|webm)$");
 
       if (!files.Any())
       {
@@ -121,7 +123,7 @@ namespace RVTR.Media.Service.Controllers
         {
           return BadRequest("Invalid file name");
         }
-        if ((!PictureRegexExtension.IsMatch(file.FileName)) && (!AudioRegexExtension.IsMatch(file.FileName)))
+        if ((!PictureRegexExtension.IsMatch(file.FileName)) && (!AudioRegexExtension.IsMatch(file.FileName)) && (!VideoRegexExtension.IsMatch(file.FileName)))
         {
           return BadRequest("Invalid file extention");
         }
@@ -137,6 +139,13 @@ namespace RVTR.Media.Service.Controllers
           if (file.Length > (12 * 1024 * 1024))
           {
             return BadRequest("File too large (12mb Max)");
+          }
+        }
+        if (VideoRegexExtension.IsMatch(file.FileName))
+        {
+          if (file.Length > (100 * 1024 * 1024))
+          {
+            return BadRequest("File too large (100mb Max)");
           }
         }
 
@@ -157,6 +166,7 @@ namespace RVTR.Media.Service.Controllers
         switch (group)
         {
           case "audio":
+          case "video":
           case "profiles":
           case "campgrounds":
           case "campsites":
@@ -178,6 +188,10 @@ namespace RVTR.Media.Service.Controllers
               else if (AudioRegexExtension.IsMatch(file.FileName))
               {
                 model.AltText = "Audio of " + model.GroupIdentifier;
+              }
+              else if (VideoRegexExtension.IsMatch(file.FileName))
+              {
+                model.AltText = "Video of " + model.GroupIdentifier;
               }
               _logger.LogDebug("adding media model");
 

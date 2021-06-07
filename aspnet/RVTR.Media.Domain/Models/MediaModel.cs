@@ -10,7 +10,7 @@ namespace RVTR.Media.Domain.Models
   public class MediaModel : AEntity, IValidatableObject
   {
     [Required(ErrorMessage = "Group is required")]
-    [RegularExpression(@"(profiles|campgrounds|campsites)", ErrorMessage = "Group affiliation not recognized.")]
+    [RegularExpression(@"(profiles|campgrounds|campsites|audio|video)", ErrorMessage = "Group affiliation not recognized.")]
     public string Group { get; set; }
 
     [Required(ErrorMessage = "GroupIdentifier is required")]
