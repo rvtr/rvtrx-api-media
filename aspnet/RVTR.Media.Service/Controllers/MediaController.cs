@@ -155,10 +155,6 @@ namespace RVTR.Media.Service.Controllers
       {
         Match extensionmatch = Extensions.Match(file.FileName);
         string extension = extensionmatch.ToString();
-
-
-
-
         MediaModel model = new MediaModel();
         model.Group = group;
         model.GroupIdentifier = groupidentifier;
