@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using RVTR.Media.Domain.Interfaces;
 using RVTR.Media.Domain.Models;
 
@@ -10,7 +11,7 @@ namespace RVTR.Media.Context.Repositories
   public class UnitOfWork : IUnitOfWork
   {
     private readonly MediaContext _context;
-
+    
     public IRepository<MediaModel> Media { get; }
 
     /// <summary>
