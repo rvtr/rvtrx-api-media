@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -40,6 +41,10 @@ namespace RVTR.Media.Service
     /// <param name="services"></param>
     public void ConfigureServices(IServiceCollection services)
     {
+      services.AddAzureClients(options => {
+        options.AddBlobServiceClient(_configuration.GetConnectionString("storage"));
+        
+      });
       services.AddApiVersioning(options =>
       {
         options.ReportApiVersions = true;
@@ -56,7 +61,7 @@ namespace RVTR.Media.Service
 
       services.AddDbContext<MediaContext>(options =>
       {
-        //options.UseCosmos(_configuration["Cosmosdb:AccountEndpoint"], _configuration["Cosmosdb:AccountKey"], _configuration["Cosmosdb:DatabaseName"]);
+        
         options.UseNpgsql(_configuration.GetConnectionString("pgsql"));
       }, ServiceLifetime.Transient);
 

@@ -11,8 +11,7 @@ namespace RVTR.Media.Context.Repositories
   public class UnitOfWork : IUnitOfWork
   {
     private readonly MediaContext _context;
-    private readonly IConfiguration _configuration;
-
+    
     public IRepository<MediaModel> Media { get; }
 
     /// <summary>

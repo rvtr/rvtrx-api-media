@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +21,8 @@ namespace RVTR.Media.Testing.Tests
     private readonly ILogger<MediaController> _logger;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IConfiguration _configuration;
+
+    private readonly BlobServiceClient _blobServiceClient;
 
     public static readonly IEnumerable<object[]> Medias = new List<object[]>
     {
@@ -56,7 +59,7 @@ namespace RVTR.Media.Testing.Tests
       _logger = loggerMock.Object;
       _unitOfWork = unitOfWorkMock.Object;
       _configuration = configurationMock.Object;
-      _controller = new MediaController(_logger, _unitOfWork, _configuration);
+      _controller = new MediaController(_logger, _unitOfWork, _configuration, _blobServiceClient);
     }
 
     [Fact]
