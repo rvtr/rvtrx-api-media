@@ -9,6 +9,9 @@ test_coverage/
 appsettings*
 !appsettings.json
 
+# docker
+*.env
+
 # macos
 .DS_Store
 
